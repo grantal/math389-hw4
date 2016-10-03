@@ -6,10 +6,10 @@ long mul(long n, long m) {
 
 char input_char() {
     char c;
-    scanf("%c",&c)
+    scanf("%c",&c);
     return c;
 }
 
 void output_long(long v) {
-    printf("%d\n", v);
+    printf("%ld\n", v);
 }
