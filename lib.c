@@ -4,10 +4,10 @@ long mul(long n, long m) {
     return n*m;
 }
 
-char input_char() {
+long input_char() {
     char c;
     scanf("%c",&c);
-    return c;
+    return (long)c;
 }
 
 void output_long(long v) {

@@ -4,7 +4,12 @@
 
 void my_dc(long *calc_stack);
 
+
 int main() {
+    long a = -79;
+    long b = 8;
+    printf("%ld mod %ld: %ld\n", a, b, (long)mod(a,b));
+    printf("%ld mod %ld: %ld\n", a, b, (long)(a % b));
     long *calc_stack = (long *)malloc(BIG_ENOUGH*sizeof(long)); 
     //printf("calc stack address: %ld", (long)calc_stack);
     my_dc(calc_stack);

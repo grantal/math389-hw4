@@ -51,6 +51,7 @@ else:
     movq    $120, %rcx
     cmpq    %rdx, %rcx
     je      return 
+
     jmp     loop 
 
 
@@ -103,7 +104,53 @@ mulcall:
     movq    %rax, -1(%rbx) 
     jmp     loop 
 
+modcall:
+    movq    -1(%rbx), %rsi   # get top item off stack
+    movq    $0, -1(%rbx)     # overwrite the higher one
+    subq    $1, %rbx         # decrement the calc pointer
+    movq    -1(%rbx), %rdi   # get top item off stack
+    # put the remainder at the new top
+    callq   mod
+    movq    %rax, -1(%rbx) 
+    jmp     loop 
+
 return:
     movq    $0, %rax    # return 0
     popq    %rbp        #
     retq                #
+
+
+# actual functions
+    
+# mod(n,d)
+# rdi % rsi
+# where %rdi is n, the dividend
+# and %rsi is d the divisor
+.globl mod
+mod:
+    # dealing with a negative n
+    movq    $0, %rax
+    cmpq    $0, %rdi
+    jge      modloop
+    negq    %rdi
+    # putting a flag in rcx
+    movq    $1, %rcx
+modloop:
+    subq    %rsi, %rdi 
+    cmpq    $0, %rdi
+    jl      modreturn
+    jmp     modloop
+modreturn:
+    # how far away -rdi is from rsi
+    # rax = rsi + rdi
+    movq    $0, %rax
+    addq    %rsi, %rax
+    addq    %rdi, %rax
+    cmpq    $1, %rcx  # seeing if the flag is set
+    je      modnegreturn
+    retq
+modnegreturn:
+    negq    %rax
+    retq
+    
+
