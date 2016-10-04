@@ -35,6 +35,17 @@ else:
     cmpq    %rdx, %rcx
     je      add 
 
+    # subtract top two if it is -
+    movq    $45, %rcx
+    cmpq    %rdx, %rcx
+    je      sub 
+
+
+    # multiply top two if it is *
+    movq    $42, %rcx
+    cmpq    %rdx, %rcx
+    je      mulcall
+
 
     # quit if %rdx is 'x'
     movq    $120, %rcx
@@ -70,6 +81,27 @@ add:
     movq    %rdx, -1(%rbx) 
     jmp     loop 
     
+# subtracts top from previous top
+sub:
+    movq    -1(%rbx), %rcx   # get top item off stack
+    movq    $0, -1(%rbx)     # overwrite the higher one
+    subq    $1, %rbx         # decrement the calc pointer
+    movq    -1(%rbx), %rdx   # get top item off stack
+    # put the difference at the new top
+    subq    %rcx, %rdx
+    movq    %rdx, -1(%rbx) 
+    jmp     loop 
+
+
+mulcall:
+    movq    -1(%rbx), %rdi   # get top item off stack
+    movq    $0, -1(%rbx)     # overwrite the higher one
+    subq    $1, %rbx         # decrement the calc pointer
+    movq    -1(%rbx), %rsi   # get top item off stack
+    # put the product at the new top
+    callq   mul
+    movq    %rax, -1(%rbx) 
+    jmp     loop 
 
 return:
     movq    $0, %rax    # return 0
