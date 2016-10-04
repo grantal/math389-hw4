@@ -46,6 +46,10 @@ else:
     cmpq    %rdx, %rcx
     je      mulcall
 
+    # modulo top two if it is %
+    movq    $37, %rcx
+    cmpq    %rdx, %rcx
+    je      modcall
 
     # quit if %rdx is 'x'
     movq    $120, %rcx
