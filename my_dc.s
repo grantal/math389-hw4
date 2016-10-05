@@ -133,7 +133,7 @@ return:
 .globl mod
 mod:
     # dealing with a negative n
-    movq    $0, %rax
+    movq    $0, %rcx
     cmpq    $0, %rdi
     jge      modloop
     negq    %rdi
@@ -158,3 +158,34 @@ modnegreturn:
     retq
     
 
+.globl divide
+divide:
+div:
+    # dealing with a negative n
+    movq    $1, %rcx
+    cmpq    $0, %rdi
+    jge     divcallhelp
+    negq    %rdi
+    # putting a flag in rcx
+    movq    $1, %rcx
+divcallhelp:
+    callq   divhelper
+    cmpq    $1, %rcx  # seeing if the flag is set
+    je      divnegreturn
+    retq
+divnegreturn:
+    negq    %rax
+    retq
+    
+divhelper:
+    subq    %rsi, %rdi   # rdi = rsi - rdi
+    # if rsi goes into rdi once, the the quotient is 0
+    cmpq    $0, %rdi     
+    jl      divbasecase
+    # otherwise its the quotient of one less rsi plus 1
+    callq   divhelper
+    addq    $1, %rax
+    retq
+divbasecase:
+    movq    $0, %rax
+    retq
