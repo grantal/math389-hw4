@@ -10,6 +10,7 @@ void my_dc(long *calc_stack);
 
 
 int main() {
+    /*
     long a = -13;
     long b = 4;
     printf("%ld div %ld: %ld\n", a, b, (long)(divide(a,b)));
@@ -27,6 +28,7 @@ int main() {
     calc_stack[4] = 4l;
     printf("dcon: %ld%ld%ld%ld\n", calc_stack[3], calc_stack[2], calc_stack[1], calc_stack[0]);
     printf("dcon: %ld\n", (long)dcon(&calc_stack[4])); 
+    */
     long x = 4l;
     long p = 3l;
     printf("%ld to the %ld: %ld\n", x, p, (long)(power(x,p)));

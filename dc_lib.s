@@ -3,6 +3,8 @@
 # dc_lib.s
 # This has all the functions I will call in my_dc.s
 
+    .align 16
+
 # mod(n,d)
 # rdi % rsi
 # where %rdi is n, the dividend
@@ -97,6 +99,7 @@ dcon_return:
 
 # pow
 # computes x^p
+/* old power function
 .globl power
 power: # again, c thinks I want the pow in math.h
 .globl pow
@@ -113,5 +116,69 @@ pow_loop:
     callq   mul        #multiply rax by rdx
     jmp     pow_loop
 pow_return:
+    retq
+*/
+.globl power
+power: # again, c thinks I want the pow in math.h
+.globl pow
+pow:
+    # make stack frame
+    pushq   %rbp 
+    movq    %rsp, %rbp
+    subq    $16, %rsp
+    
+    # save current values of r12, r13    
+    movq   %r12, -8(%rbp)
+    movq   %r13, -16(%rbp)
+
+    movq    %rdi, %r12 # r12 is x
+    movq    %rsi, %r13 # r13 is p 
+    
+    # if p = 0, then basecase
+    cmpq    $0, %r13
+    je      pow_basecase
+    # if r12 & 1 = 0 then r12 is even
+    movq    %r13, %rcx
+    andq    $1, %rcx
+    cmpq    $0, %rcx
+    je      pow_even
+    # otherwise, it's odd
+    jmp     pow_odd
+    
+pow_basecase:
+    movq    $1, %rax 
+    jmp     pow_return
+pow_even:
+    # don't need to change x
+    # p = p//2
+    # (pow(x,p//2))**2
+    movq    %r12, %rdi
+    sarq    %r13
+    movq    %r13, %rsi
+    callq   pow
+    # square result
+    movq    %rax, %rdi
+    movq    %rax, %rsi
+    callq   mul
+    jmp     pow_return
+pow_odd:
+    # p -= 1
+    # want: pow(x,p-1)*x
+    subq    $1, %r13 
+    movq    %r13, %rsi
+    movq    %r12, %rdi
+    callq   pow
+    movq    %rax, %rsi
+    movq    %r12, %rdi
+    # multiply result time x
+    callq   mul
+    jmp     pow_return
+pow_return:
+    # restore r12, r13
+    movq   -8(%rbp), %r12
+    movq   -16(%rbp), %r13
+    # resore stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
     retq
 
