@@ -93,7 +93,8 @@ dcon_return:
 
 # pow
 # computes x^p
-.globl pow
+.globl power
+power: # again, c thinks I want the pow in math.h
 pow:
     movq    %rdi, %rdx # rdx is x
     movq    %rsi, %rcx # rcx is p 
@@ -105,7 +106,7 @@ pow_loop:
     movq    %rdx, %rdi
     movq    %rax, %rsi
     callq   mul        #multiply rax by rdx
-    jmp pow_loop
+    jmp     pow_loop
 pow_return:
     retq
 

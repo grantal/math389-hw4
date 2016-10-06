@@ -3,7 +3,7 @@
 #define BIG_ENOUGH 100
 
 // compile with:
-// gcc -o dc test_dc_lib.c lib.c dc_lib.s -g
+// gcc -o test test_dc_lib.c lib.c dc_lib.s -g
 
 
 void my_dc(long *calc_stack);
@@ -27,9 +27,10 @@ int main() {
     calc_stack[4] = 4l;
     printf("dcon: %ld%ld%ld%ld\n", calc_stack[3], calc_stack[2], calc_stack[1], calc_stack[0]);
     printf("dcon: %ld\n", (long)dcon(&calc_stack[4])); 
-    /*
     long x = 4l;
-    long p = 2l;
-    printf("%ld to the %ld: %ld\n", x, p, (long)(pow(a,b)));
-    */
+    long p = 3l;
+    printf("%ld to the %ld: %ld\n", x, p, (long)(power(x,p)));
+    x = 5l;
+    p = 7l;
+    printf("%ld to the %ld: %ld\n", x, p, (long)(power(x,p)));
 }
