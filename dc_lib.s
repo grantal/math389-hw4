@@ -11,6 +11,11 @@
 # and %rsi is d the divisor
 .globl mod
 mod:
+    # setup stack frame
+    pushq   %rbp 
+    movq    %rsp, %rbp
+    subq    $0, %rsp
+
     # dealing with a negative n
     movq    $0, %rcx
     cmpq    $0, %rdi
@@ -29,6 +34,10 @@ modreturn:
     movq    $0, %rax
     addq    %rsi, %rax
     addq    %rdi, %rax
+    # teardown stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
+
     cmpq    $1, %rcx  # seeing if the flag is set
     je      modnegreturn
     retq
@@ -36,37 +45,54 @@ modnegreturn:
     negq    %rax
     retq
     
-
+# div(a,b)
+# computes a / b
 .globl divide
 divide: #this is here because c gets confused about calling "div"
 div:
+    # setup stack frame
+    pushq   %rbp 
+    movq    %rsp, %rbp
+    subq    $8, %rsp
+    
     # dealing with a negative n
     movq    $1, %rcx
     cmpq    $0, %rdi
-    jge     divcallhelp
+    jge     div_call_help
     negq    %rdi
     # putting a flag in rcx
     movq    $1, %rcx
-divcallhelp:
-    callq   divhelper
+div_call_help:
+    callq   div_helper
     cmpq    $1, %rcx  # seeing if the flag is set
-    je      divnegreturn
-    retq
-divnegreturn:
+    je      div_neg_return
+    jmp     div_return
+div_neg_return:
     negq    %rax
-    retq
+    jmp     div_return
     
-divhelper:
+div_helper:
+    # setup stack frame
+    pushq   %rbp 
+    movq    %rsp, %rbp
+    subq    $8, %rsp
+
     subq    %rsi, %rdi   # rdi = rsi - rdi
     # if rsi goes into rdi once, the the quotient is 0
     cmpq    $0, %rdi     
-    jl      divbasecase
+    jl      div_basecase
     # otherwise its the quotient of one less rsi plus 1
-    callq   divhelper
+    callq   div_helper
     addq    $1, %rax
-    retq
-divbasecase:
+    jmp     div_return
+div_basecase:
     movq    $0, %rax
+    jmp     div_return
+# acts as a return for both div and div_helper
+div_return:
+    # teardown stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
     retq
 
 
@@ -75,8 +101,11 @@ divbasecase:
 # rdi has the stack pointer
 .globl dcon
 dcon:
+    # setup stack frame
+    pushq   %rbp 
+    movq    %rsp, %rbp
+    subq    $0, %rsp
                           # rdi will point to the element we want
-    #movq    %rdi, %rdx
     movq    0(%rdi), %rcx # rcx will be the counter 
     movq    $0, %rax      # rax will be the result
 dcon_loop:
@@ -95,29 +124,13 @@ dcon_loop:
     addq    0(%rdi), %rax 
     jmp     dcon_loop
 dcon_return:
+    # teardown stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
     retq
 
 # pow
 # computes x^p
-/* old power function
-.globl power
-power: # again, c thinks I want the pow in math.h
-.globl pow
-pow:
-    movq    %rdi, %rdx # rdx is x
-    movq    %rsi, %rcx # rcx is p 
-    movq    $1, %rax   # result
-pow_loop: 
-    cmpq    $0, %rcx
-    jle     pow_return
-    subq    $1, %rcx
-    movq    %rdx, %rdi
-    movq    %rax, %rsi
-    callq   mul        #multiply rax by rdx
-    jmp     pow_loop
-pow_return:
-    retq
-*/
 .globl power
 power: # again, c thinks I want the pow in math.h
 .globl pow
