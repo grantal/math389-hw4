@@ -99,6 +99,7 @@ dcon_return:
 # computes x^p
 .globl power
 power: # again, c thinks I want the pow in math.h
+.globl pow
 pow:
     movq    %rdi, %rdx # rdx is x
     movq    %rsi, %rcx # rcx is p 

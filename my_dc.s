@@ -61,6 +61,11 @@ else:
     cmpq    %rdx, %rcx
     je      dconcall
 
+    # power if ^
+    movq    $94, %rcx
+    cmpq    %rdx, %rcx
+    je      powcall
+
     # quit if %rdx is 'x'
     movq    $120, %rcx
     cmpq    %rdx, %rcx
@@ -156,6 +161,15 @@ dconcall_end:
     movq    %rax, -8(%rbx) 
     jmp     loop 
 
+powcall:
+    movq    -8(%rbx), %rsi   # get top item off stack
+    movq    $0, -8(%rbx)     # overwrite the higher one
+    subq    $8, %rbx         # decrement the calc pointer
+    movq    -8(%rbx), %rdi   # get top item off stack
+    # put the power at the new top
+    callq   pow
+    movq    %rax, -8(%rbx) 
+    jmp     loop 
 
 return:
     movq    $0, %rax    # return 0
