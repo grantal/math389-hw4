@@ -56,6 +56,11 @@ else:
     cmpq    %rdx, %rcx
     je      divcall
 
+    # dcon if d
+    movq    $100, %rcx
+    cmpq    %rdx, %rcx
+    je      dconcall
+
     # quit if %rdx is 'x'
     movq    $120, %rcx
     cmpq    %rdx, %rcx
@@ -130,6 +135,24 @@ divcall:
     movq    -8(%rbx), %rdi   # get top item off stack
     # put the quotient at the new top
     callq   div
+    movq    %rax, -8(%rbx) 
+    jmp     loop 
+
+dconcall:
+    movq    %rbx, %rdi     # pass pointer to 'top of stack' to dcon
+    subq    $8, %rdi
+    callq   dcon
+    movq    -8(%rbx), %rcx # rcx will be counter for purge
+# remove top rcx number of items
+dconcall_loop:
+    cmpq    $0, %rcx
+    jle     dconcall_end
+    subq    $1, %rcx
+    subq    $8, %rbx
+    movq    $0, 0(%rbx)
+    jmp dconcall_loop
+# put dcon result on top
+dconcall_end:
     movq    %rax, -8(%rbx) 
     jmp     loop 
 

@@ -1,3 +1,7 @@
+# Alex Grant
+# Math 389
+# dc_lib.s
+# This has all the functions I will call in my_dc.s
 
 # mod(n,d)
 # rdi % rsi
