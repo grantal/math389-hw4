@@ -51,6 +51,11 @@ else:
     cmpq    %rdx, %rcx
     je      modcall
 
+    # divide top two if it is /
+    movq    $47, %rcx
+    cmpq    %rdx, %rcx
+    je      divcall
+
     # quit if %rdx is 'x'
     movq    $120, %rcx
     cmpq    %rdx, %rcx
@@ -118,6 +123,17 @@ modcall:
     movq    %rax, -1(%rbx) 
     jmp     loop 
 
+divcall:
+    movq    -1(%rbx), %rsi   # get top item off stack
+    movq    $0, -1(%rbx)     # overwrite the higher one
+    subq    $1, %rbx         # decrement the calc pointer
+    movq    -1(%rbx), %rdi   # get top item off stack
+    # put the quotient at the new top
+    callq   div
+    movq    %rax, -1(%rbx) 
+    jmp     loop 
+
+
 return:
     movq    $0, %rax    # return 0
     popq    %rbp        #
@@ -162,30 +178,82 @@ modnegreturn:
 divide:
 div:
     # dealing with a negative n
-    movq    $1, %rcx
     cmpq    $0, %rdi
-    jge     divcallhelp
-    negq    %rdi
-    # putting a flag in rcx
-    movq    $1, %rcx
-divcallhelp:
-    callq   divhelper
-    cmpq    $1, %rcx  # seeing if the flag is set
-    je      divnegreturn
+    jge     div_pos_call 
+    call    div_neg_helper
     retq
-divnegreturn:
-    negq    %rax
+div_pos_call:
+    call    div_pos_helper
     retq
-    
-divhelper:
+# helper if dividend is positive
+div_pos_helper:
     subq    %rsi, %rdi   # rdi = rsi - rdi
     # if rsi goes into rdi once, the the quotient is 0
     cmpq    $0, %rdi     
-    jl      divbasecase
+    jl      div_basecase
     # otherwise its the quotient of one less rsi plus 1
-    callq   divhelper
+    callq   div_pos_helper
     addq    $1, %rax
     retq
-divbasecase:
+# if negative
+div_neg_helper:
+    addq    %rsi, %rdi   # rdi = rsi + rdi
+    # if rsi goes into rdi once, the the quotient is 0
+    cmpq    $0, %rdi     
+    jg      div_basecase
+    # otherwise its the quotient of one more rsi minus 1
+    callq   div_pos_helper
+    subq    $1, %rax
+    retq
+# this basecase is being treated as part of both div helpers
+# it returns for both of those functions
+div_basecase:
     movq    $0, %rax
     retq
+
+
+# dcon
+# gets decimals
+# rdi has the stack pointer
+.globl dcon
+dcon:
+                          # rdi will point to the element we want
+    movq    %rdi, %rdx
+    callq   output_long
+    movq    0(%rdx), %rcx # rcx will be the counter 
+    movq    $0, %rax      # rax will be the result
+dcon_loop:
+    cmpq    $0, %rcx      # see if counter is 0
+    jle     dcon_return
+    subq    $1, %rcx      # subtract 1 from counter and pointer
+    subq    $1, %rdx
+    addq    0(%rdx), %rax 
+    jmp     dcon_loop
+dcon_return:
+    movq    %rdx, %rdi
+    callq   output_long
+    retq
+
+# pow
+# computes x^p
+.globl pow
+pow:
+    movq    %rdi, %rdx # rdx is x
+    movq    %rsi, %rcx # rcx is p 
+    movq    $1, %rax   # result
+pow_loop: 
+    cmpq    $0, %rcx
+    jle     pow_return
+    subq    %rcx
+    movq    %rdx, %rdi
+    callq   mul        #multiply rax by rdx
+    jmp pow_loop
+pow_return:
+    retq
+
+
+
+
+
+
+
