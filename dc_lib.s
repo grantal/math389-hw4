@@ -56,7 +56,7 @@ div:
     subq    $8, %rsp
     
     # dealing with a negative n
-    movq    $1, %rcx
+    movq    $0, %rcx
     cmpq    $0, %rdi
     jge     div_call_help
     negq    %rdi

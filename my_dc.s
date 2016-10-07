@@ -6,6 +6,9 @@
 my_dc:
     pushq   %rbp       
     movq    %rsp, %rbp	
+    subq    $16, %rsp
+    # storing current rbx
+    movq    %rbx, -8(%rbp)
     movq    %rdi, %rbx # rbx will have the calculator stack pointer
     
 loop:
@@ -172,6 +175,10 @@ powcall:
     jmp     loop 
 
 return:
+    # restore rbx
+    movq    -8(%rbp), %rbx
     movq    $0, %rax    # return 0
-    popq    %rbp        #
+    # resore stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
     retq                #

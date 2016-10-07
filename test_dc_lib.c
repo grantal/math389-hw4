@@ -10,12 +10,16 @@ void my_dc(long *calc_stack);
 
 
 int main() {
-    long a = -13;
-    long b = 4;
+    long a = -13l;
+    long b = 4l;
     printf("%ld div %ld: %ld\n", a, b, (long)(divide(a,b)));
     printf("%ld div %ld: %ld\n", a, b, (long)(a / b));
     printf("%ld mod %ld: %ld\n", a, b, (long)(mod(a,b)));
     printf("%ld mod %ld: %ld\n", a, b, (long)(a % b));
+    a = (long)power(3,3);
+    b = 4l;
+    printf("%ld div %ld: %ld\n", a, b, (long)(divide(a,b)));
+    printf("%ld div %ld: %ld\n", a, b, (long)(a / b));
     long *calc_stack = (long *)malloc(BIG_ENOUGH*sizeof(long)); 
     calc_stack[0] = 5l;
     calc_stack[1] = 7l;
